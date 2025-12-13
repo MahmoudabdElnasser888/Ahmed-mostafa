@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>إدارة تمارين العملاء</title>
+
+<style>
+body{
+    font-family: Arial;
+    background:#111;
+    color:#fff;
+    margin:0;
+    padding:0;
+}
+
+.container{
+    padding:20px;
+    max-width:700px;
+    margin:auto;
+}
+
+h2, h3{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+.client-list{
+    background:#222;
+    padding:10px;
+    border-radius:10px;
+    margin-bottom:20px;
+}
+
+.client-item{
+    background:#333;
+    padding:12px;
+    border-radius:8px;
+    margin:8px 0;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+.client-item:hover{
+    background:#444;
+}
+
+.workout-box{
+    background:#1a1a1a;
+    padding:15px;
+    border-radius:12px;
+    margin-top:20px;
+}
+
+input, textarea{
+    width:100%;
+    padding:10px;
+    margin:10px 0;
+    border-radius:6px;
+    border:1px solid #333;
+    background:#222;
+    color:#fff;
+}
+
+button{
+    padding:12px 20px;
+    border:none;
+    border-radius:6px;
+    margin-top:10px;
+    background:#00c853;
+    cursor:pointer;
+    font-size:16px;
+}
+
+button:hover{
+    background:#00a844;
+}
+
+.workout-item{
+    background:#222;
+    padding:12px;
+    border-radius:10px;
+    margin:10px 0;
+}
+
+.edit-btn{
+    background:#2979ff;
+    margin-right:5px;
+}
+
+.delete-btn{
+    background:#d32f2f;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+    <h2>تعديل تمارين العملاء</h2>
+
+    <h3>اختر العميل</h3>
+    <div id="clientList" class="client-list">
+        تحميل العملاء...
+    </div>
+
+    <div id="workoutEditor" class="workout-box" style="display:none;">
+        <h3 id="clientNameTitle"></h3>
+
+        <h4>إضافة تمرين جديد</h4>
+        <input type="text" id="workoutTitle" placeholder="عنوان التمرين">
+        <textarea id="workoutDesc" placeholder="وصف التمرين (اختياري)"></textarea>
+        <input type="text" id="workoutVideo" placeholder="رابط فيديو التمرين (اختياري)">
+        <button onclick="addWorkout()">إضافة التمرين</button>
+
+        <h3 style="margin-top:25px;">جميع التمارين</h3>
+        <div id="workoutsList"></div>
+    </div>
+
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { 
+    getFirestore, doc, getDoc, updateDoc, onSnapshot, collection, query, where, getDocs 
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDYTF1Kuju-i06J__sQ0sNqEOD7CcQYeos",
+  authDomain: "ahmed-mostafa-abfef.firebaseapp.com",
+  projectId: "ahmed-mostafa-abfef",
+  storageBucket: "ahmed-mostafa-abfef.firebasestorage.app",
+  messagingSenderId: "542458359790",
+  appId: "1:542458359790:web:2c3a8b06e5c7e89df528ff",
+  measurementId: "G-18FBMGFYJJ"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const clientList = document.getElementById("clientList");
+const workoutsList = document.getElementById("workoutsList");
+const clientNameTitle = document.getElementById("clientNameTitle");
+
+let selectedClientUID = null;
+
+// ********** 1) LOAD CLIENTS OF THIS COACH **********
+onAuthStateChanged(auth, async user => {
+    if(!user) return window.location.href = "login.html";
+
+    const q = query(collection(db, "users"), where("coachId", "==", user.uid));
+    const clientsSnap = await getDocs(q);
+
+    clientList.innerHTML = "";
+
+    clientsSnap.forEach(c => {
+        const data = c.data();
+
+        let div = document.createElement("div");
+        div.className = "client-item";
+        div.textContent = data.fullName || "بدون اسم";
+
+        div.onclick = () => openClientWorkouts(c.id, data.fullName);
+
+        clientList.appendChild(div);
+    });
+
+    if(clientsSnap.size === 0){
+        clientList.innerHTML = "<p style='text-align:center;color:#aaa;'>لا يوجد عملاء مرتبطين بك.</p>";
+    }
+});
+
+
+// ********** 2) OPEN SELECTED CLIENT **********
+async function openClientWorkouts(uid, name){
+    selectedClientUID = uid;
+    clientNameTitle.textContent = `تمارين: ${name}`;
+    document.getElementById("workoutEditor").style.display = "block";
+
+    const ref = doc(db, "userWorkouts", uid);
+
+    onSnapshot(ref, snap => {
+        let data = snap.data();
+
+        workoutsList.innerHTML = "";
+
+        if(!data || !data.workouts || data.workouts.length === 0){
+            workoutsList.innerHTML = "<p style='color:#aaa;'>لا يوجد تمارين بعد.</p>";
+            return;
+        }
+
+        data.workouts.forEach((w, index) => {
+            let div = document.createElement("div");
+            div.className = "workout-item";
+
+            div.innerHTML = `
+                <b>${w.title}</b><br>
+                <small>${w.desc || ""}</small><br>
+                <a href="${w.video || "#"}" target="_blank" style="color:#4fc3f7;">رابط الفيديو</a><br><br>
+
+                <button class="edit-btn" onclick="editWorkout(${index})">تعديل</button>
+                <button class="delete-btn" onclick="deleteWorkout(${index})">حذف</button>
+            `;
+
+            workoutsList.appendChild(div);
+        });
+    });
+}
+
+
+// ********** 3) ADD WORKOUT **********
+window.addWorkout = async function(){
+    if(!selectedClientUID) return;
+
+    const title = document.getElementById("workoutTitle").value.trim();
+    const desc = document.getElementById("workoutDesc").value.trim();
+    const video = document.getElementById("workoutVideo").value.trim();
+
+    if(!title) return alert("اكتب عنوان للتمرين");
+
+    const ref = doc(db, "userWorkouts", selectedClientUID);
+    const snap = await getDoc(ref);
+
+    let arr = [];
+    if(snap.exists()) arr = snap.data().workouts || [];
+
+    arr.push({ title, desc, video });
+
+    await updateDoc(ref, { workouts: arr }).catch(async () => {
+        await updateDoc(ref, { workouts: arr });
+    });
+
+    document.getElementById("workoutTitle").value = "";
+    document.getElementById("workoutDesc").value = "";
+    document.getElementById("workoutVideo").value = "";
+};
+
+
+// ********** 4) DELETE WORKOUT **********
+window.deleteWorkout = async function(index){
+    if(!selectedClientUID) return;
+
+    const ref = doc(db, "userWorkouts", selectedClientUID);
+    const snap = await getDoc(ref);
+    const arr = snap.data().workouts;
+
+    arr.splice(index, 1);
+
+    await updateDoc(ref, { workouts: arr });
+};
+
+
+// ********** 5) EDIT WORKOUT **********
+window.editWorkout = async function(index){
+    const newTitle = prompt("عنوان التمرين الجديد:");
+    if(!newTitle) return;
+
+    const newDesc = prompt("الوصف الجديد (اختياري):");
+    const newVideo = prompt("رابط الفيديو الجديد (اختياري):");
+
+    const ref = doc(db, "userWorkouts", selectedClientUID);
+    const snap = await getDoc(ref);
+    const arr = snap.data().workouts;
+
+    arr[index] = {
+        title: newTitle,
+        desc: newDesc || "",
+        video: newVideo || ""
+    };
+
+    await updateDoc(ref, { workouts: arr });
+};
+
+</script>
+
+</body>
+</html>

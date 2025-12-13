@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>عــروض CrazyGym</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+body{
+    margin:0;
+    font-family:'Cairo',sans-serif;
+    background:#0c0c0c;
+    color:#fff;
+}
+header{
+    text-align:center;
+    padding:40px 20px;
+}
+header h1{
+    font-size:2.3rem;
+    color:#ff3b3b;
+    margin:0;
+}
+header p{
+    color:#ccc;
+    margin-top:10px;
+}
+
+/* GRID */
+.offers{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:20px;
+    padding:20px;
+}
+
+/* CARD */
+.card{
+    background:#141414;
+    padding:20px;
+    border-radius:16px;
+    border:1px solid rgba(255,255,255,0.08);
+    box-shadow:0 0 10px rgba(255,0,0,0.2);
+    transition:0.4s;
+    position:relative;
+    overflow:hidden;
+}
+.card:hover{
+    transform:translateY(-8px);
+    box-shadow:0 0 25px rgba(255,0,0,0.4);
+}
+
+.card h2{
+    font-size:1.5rem;
+    color:#ff3b3b;
+}
+.card p{
+    color:#ddd;
+    line-height:1.6;
+    font-size:1rem;
+}
+.price{
+    margin-top:15px;
+    font-size:1.6rem;
+    font-weight:800;
+    color:#fff;
+}
+.old-price{
+    text-decoration:line-through;
+    color:#999;
+    font-size:1rem;
+}
+
+.btn{
+    margin-top:20px;
+    display:block;
+    text-align:center;
+    padding:12px 0;
+    background:#ff3b3b;
+    color:#fff;
+    font-weight:700;
+    border-radius:50px;
+    text-decoration:none;
+    transition:0.3s;
+}
+.btn:hover{
+    background:#ffffff;
+    color:#000;
+}
+
+/* OFFER TAG */
+.tag{
+    position:absolute;
+    top:10px;
+    left:-40px;
+    background:#ff3b3b;
+    color:#fff;
+    padding:8px 40px;
+    transform:rotate(-20deg);
+    font-weight:700;
+}
+
+</style>
+</head>
+<body>
+
+<header>
+    <h1>🔥 عروض CrazyGym الحصرية 🔥</h1>
+    <p>اختار العرض اللي يناسبك – جودة عالية، سعر أقل 🔥💪</p>
+</header>
+
+<div class="offers">
+
+    <div class="card">
+        <div class="tag">خصم 40%</div>
+        <h2>عرض الشهر الكامل</h2>
+        <p>متابعة يومية + نظام تدريب + نظام غذائي + دعم مباشر.</p>
+        <div class="old-price">799 جنيه</div>
+        <div class="price">499 جنيه</div>
+        <a class="btn" href="#">اشــــتـــــرك الآن</a>
+    </div>
+
+    <div class="card">
+        <h2>عرض الأسبوع</h2>
+        <p>برنامج أسبوعي كامل – تمارين + أكل + متابعة.</p>
+        <div class="old-price">250 جنيه</div>
+        <div class="price">150 جنيه</div>
+        <a class="btn" href="#">اشــــتـــــرك الآن</a>
+    </div>
+
+    <div class="card">
+        <div class="tag">الأكثر مبيعًا</div>
+        <h2>عرض التحول السريع</h2>
+        <p>30 يوم هتغير جسمك فعلًا – يناسب التنشيف و التضخيم.</p>
+        <div class="old-price">999 جنيه</div>
+        <div class="price">650 جنيه</div>
+        <a class="btn" href="#">اشــــتـــــرك الآن</a>
+    </div>
+
+    <div class="card">
+        <h2>كورسات البنات</h2>
+        <p>خصوصي كامل بمتابعة يومية وتمارين منزلية وجيم.</p>
+        <div class="old-price">899 جنيه</div>
+        <div class="price">550 جنيه</div>
+        <a class="btn" href="#">اشــــتـــــرك الآن</a>
+    </div>
+
+    <div class="card">
+        <h2>مكالمات استشارة</h2>
+        <p>مكالمة 30 دقيقة مع المدرب – تعديل خطة كاملة.</p>
+        <div class="old-price">150 جنيه</div>
+        <div class="price">100 جنيه</div>
+        <a class="btn" href="#">احجز مكالمة</a>
+    </div>
+
+    <div class="card">
+        <h2>عرض VIP</h2>
+        <p>متابعة 24/7 – خطة مخصصة – دعم صوتي – نتائج أسرع.</p>
+        <div class="old-price">1999 جنيه</div>
+        <div class="price">1450 جنيه</div>
+        <a class="btn" href="#">اشــــتـــــرك الآن</a>
+    </div>
+
+</div>
+
+</body>
+</html>

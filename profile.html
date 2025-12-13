@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profile</title>
+
+<style>
+/* ---------------------- */
+/* RESET + BASE STYLES   */
+/* ---------------------- */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Tajawal", sans-serif;
+    background: #0f0f0f;
+    color: #fff;
+    direction: rtl;
+    text-align: right;
+}
+
+/* ---------------------- */
+/* HEADER                 */
+/* ---------------------- */
+header {
+    width: 97%;
+    padding: 18px;
+    background: #111;
+    color: #c52323;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    border-bottom: 1px solid #333;
+}
+
+/* ---------------------- */
+/* PROFILE PHOTO BLOCK    */
+/* ---------------------- */
+.profile-section {
+    margin-top: 25px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    animation: fadeUp 0.6s ease forwards;
+}
+
+.profile-img {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #f77474;
+    box-shadow: 0 0 12px rgba(247,215,116,0.5);
+    transition: 0.3s ease;
+}
+
+.profile-img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 18px rgba(247,215,116,0.9);
+}
+
+/* زر تغيير الصورة */
+.change-photo-btn {
+    margin-top: 12px;
+    padding: 8px 18px;
+    background: #c42121;
+    color: #000;
+    border-radius: 25px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: .3s;
+    border: none;
+}
+.change-photo-btn:hover {
+    background: #fff0b0;
+}
+
+/* ---------------------- */
+/* INFO CARD              */
+/* ---------------------- */
+.info {
+    width: 90%;
+    max-width: 420px;
+    background: #1a1a1a;
+    margin: 25px auto;
+    padding: 22px;
+    border-radius: 14px;
+    border: 1px solid #2f2f2f;
+    box-shadow: 0 0 8px rgba(255,255,255,0.03);
+    animation: fadeUp 0.9s ease forwards;
+}
+
+.info p {
+    font-size: 17px;
+    margin: 14px 0;
+}
+
+.info span {
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* ---------------------- */
+/* SUBSCRIPTION TIMER     */
+/* ---------------------- */
+.timer {
+    margin-top: 18px;
+    padding: 12px;
+    background: #111;
+    border-radius: 10px;
+    border: 1px solid #333;
+    text-align: center;
+    font-size: 20px;
+    color: #d11818;
+    letter-spacing: 2px;
+    box-shadow: 0 0 10px rgba(247,215,116,0.2);
+}
+
+/* ---------------------- */
+/* ANIMATIONS             */
+/* ---------------------- */
+@keyframes fadeUp {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------------------- */
+/* RESPONSIVE             */
+/* ---------------------- */
+@media (max-width: 480px) {
+    header {
+        font-size: 20px;
+    }
+    .profile-img {
+        width: 115px;
+        height: 115px;
+    }
+    .info {
+        padding: 18px;
+    }
+    .change-photo-btn {
+        font-size: 14px;
+        padding: 7px 16px;
+    }
+    .timer {
+        font-size: 18px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>Profile</header>
+
+<div class="profile-section">
+    <img id="profileImg" src="https://via.placeholder.com/140" class="profile-img">
+    <button class="change-photo-btn" onclick="document.getElementById('imgInput').click()">
+        تغيير الصورة
+    </button>
+</div>
+
+<div class="info">
+    <p>الاسم الكامل: <span id="fullName"></span></p>
+    <p>رقم الهاتف: <span id="phone"></span></p>
+    <p>البريد الإلكتروني: <span id="email"></span></p>
+
+    <p class="timer" id="timer">مدة اشتراكك المتبقية: 00:00:00</p>
+</div>
+
+<input type="file" id="imgInput" style="display:none;">
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDYTF1Kuju-i06J__sQ0sNqEOD7CcQYeos",
+  authDomain: "ahmed-mostafa-abfef.firebaseapp.com",
+  projectId: "ahmed-mostafa-abfef",
+  storageBucket: "ahmed-mostafa-abfef.firebasestorage.app",
+  messagingSenderId: "542458359790",
+  appId: "1:542458359790:web:2c3a8b06e5c7e89df528ff",
+  measurementId: "G-18FBMGFYJJ"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const profileImg = document.getElementById("profileImg");
+const imgInput = document.getElementById("imgInput");
+const fullNameSpan = document.getElementById("fullName");
+const phoneSpan = document.getElementById("phone");
+const emailSpan = document.getElementById("email");
+const timerEl = document.getElementById("timer");
+
+let timerInterval;
+
+onAuthStateChanged(auth, async user=>{
+    if(!user) return window.location.href="login.html";
+
+    const docRef = doc(db,"users",user.uid);
+    const docSnap = await getDoc(docRef);
+    if(!docSnap.exists()) return alert("لم يتم العثور على الحساب");
+
+    const data = docSnap.data();
+
+    fullNameSpan.textContent = data.fullName || "";
+    phoneSpan.textContent = data.phone || "";
+    emailSpan.textContent = data.email || "";
+    if(data.image) profileImg.src = data.image;
+
+    // عداد
+    if(data.timerActive && data.timer){
+        let targetTime;
+        if(data.timer.toDate) {
+            // Timestamp Firestore
+            targetTime = data.timer.toDate().getTime();
+        } else {
+            targetTime = new Date(data.timer).getTime();
+        }
+        startTimer(targetTime);
+    }
+});
+
+// تغيير الصورة
+profileImg.addEventListener("click",()=>imgInput.click());
+
+imgInput.addEventListener("change", async ()=>{
+    const file = imgInput.files[0];
+    if(!file) return;
+
+    const form = new FormData();
+    form.append("image",file);
+
+    const res = await fetch("https://api.imgbb.com/1/upload?key=230966cc91f42a69e2f64be5097c8b5c",{
+        method:"POST",
+        body:form
+    });
+    const data = await res.json();
+    const url = data.data.url;
+
+    profileImg.src = url;
+
+    const user = auth.currentUser;
+    const docRef = doc(db,"users",user.uid);
+    await updateDoc(docRef,{image:url});
+});
+
+// دالة العداد
+function startTimer(targetTime){
+    clearInterval(timerInterval);
+    timerInterval = setInterval(()=>{
+        const now = Date.now();
+        let diff = Math.max(0,targetTime - now);
+        let h = Math.floor(diff/3600000);
+        let m = Math.floor((diff%3600000)/60000);
+        let s = Math.floor((diff%60000)/1000);
+        timerEl.textContent = `الاشتراك: ${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+        if(diff<=0) clearInterval(timerInterval);
+    },1000);
+}
+</script>
+
+</body>
+</html>

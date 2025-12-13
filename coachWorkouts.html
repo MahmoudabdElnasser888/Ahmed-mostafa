@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>قائمة العملاء</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background:#f6f6f6;
+  margin:0;
+  padding:0;
+  direction: rtl;
+}
+
+.header {
+  background:#111;
+  color:#fff;
+  padding:18px;
+  font-size:22px;
+  text-align:center;
+}
+
+.clients-container {
+  padding:15px;
+}
+
+.client-card {
+  background:#fff;
+  margin-bottom:12px;
+  padding:15px;
+  border-radius:10px;
+  box-shadow:0 2px 7px rgba(0,0,0,0.1);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  transition:0.25s;
+}
+
+.client-card:hover {
+  transform: translateY(-3px);
+  box-shadow:0 4px 12px rgba(0,0,0,0.15);
+}
+
+.client-info {
+  display:flex;
+  flex-direction:column;
+}
+
+.client-name {
+  font-size:18px;
+  font-weight:bold;
+  color:#111;
+}
+
+.client-email {
+  font-size:14px;
+  color:#666;
+  margin-top:3px;
+}
+
+.open-btn {
+  background:#4CAF50;
+  color:#fff;
+  padding:10px 15px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  font-size:14px;
+  transition:0.3s;
+}
+
+.open-btn:hover {
+  background:#43a047;
+}
+
+.no-users {
+  text-align:center;
+  margin-top:50px;
+  font-size:18px;
+  color:#777;
+}
+</style>
+</head>
+<body>
+
+<div class="header">👤 عملائي</div>
+<div class="clients-container" id="clientsList"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDYTF1Kuju-i06J__sQ0sNqEOD7CcQYeos",
+  authDomain: "ahmed-mostafa-abfef.firebaseapp.com",
+  projectId: "ahmed-mostafa-abfef",
+  storageBucket: "ahmed-mostafa-abfef.firebasestorage.app",
+  messagingSenderId: "542458359790",
+  appId: "1:542458359790:web:2c3a8b06e5c7e89df528ff",
+  measurementId: "G-18FBMGFYJJ"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const clientsList = document.getElementById("clientsList");
+
+onAuthStateChanged(auth, async (coach) => {
+    if (!coach) return (window.location.href = "login.html");
+
+    // جلب كل العملاء اللي coachId بتاعهم = id بتاع الكوتش الحالي
+    const q = query(collection(db, "users"), where("coachId", "==", coach.uid));
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+        clientsList.innerHTML = `<div class="no-users">لا يوجد عملاء حتى الآن</div>`;
+        return;
+    }
+
+    querySnapshot.forEach((doc) => {
+        const data = doc.data();
+
+        const div = document.createElement("div");
+        div.className = "client-card";
+
+        div.innerHTML = `
+          <div class="client-info">
+            <div class="client-email">${data.fullName || "عميل بدون اسم"}</div>
+            <div class="client-email">${data.email || "بدون إيميل"}</div>
+          </div>
+
+          <button class="open-btn" data-id="${doc.id}">
+            إدارة التمارين
+          </button>
+        `;
+
+        clientsList.appendChild(div);
+    });
+
+    // عند الضغط على زر "إدارة التمارين"
+    document.querySelectorAll(".open-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+            const userId = btn.getAttribute("data-id");
+            window.location.href = `coachWorkoutEdit.html?uid=${userId}`;
+        });
+    });
+});
+</script>
+
+</body>
+</html>

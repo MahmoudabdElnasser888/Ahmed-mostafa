@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تمارين اليوم</title>
+
+<style>
+body{
+    font-family: 'Poppins', Arial, sans-serif;
+    background:#111;
+    color:#fff;
+    margin:0;
+    padding:0;
+}
+
+.container{
+    padding:20px;
+    max-width:700px;
+    margin:auto;
+}
+
+h2{
+    text-align:center;
+    margin-bottom:25px;
+    color:#FFD700;
+    font-size:28px;
+}
+
+.workout-card{
+    background:#1c1c1c;
+    padding:20px;
+    margin:15px 0;
+    border-radius:12px;
+    border:1px solid #333;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.workout-card:hover{
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.7);
+}
+
+.workout-card h3{
+    margin:0 0 12px 0;
+    color:#fff;
+    font-size:20px;
+}
+
+.workout-card p{
+    margin:0 0 12px 0;
+    line-height:1.6;
+    color:#ccc;
+}
+
+.video-btn{
+    display:inline-block;
+    background:#2979ff;
+    padding:10px 18px;
+    border-radius:6px;
+    text-decoration:none;
+    color:#fff;
+    font-size:15px;
+    transition: background 0.2s;
+}
+
+.video-btn:hover{
+    background:#1c54d6;
+}
+
+.no-workouts{
+    text-align:center;
+    color:#aaa;
+    margin-top:25px;
+    font-size:18px;
+}
+
+#expired{
+    text-align:center;
+    color:#ff5252;
+    font-size:20px;
+    margin-top:30px;
+    display:none;
+    font-weight:bold;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+    <h2>التمارين الخاصة بك</h2>
+
+    <div id="expired">⚠ اشتراكك منتهي — تواصل مع الكوتش لتجديده</div>
+
+    <div id="workoutsList"></div>
+
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDYTF1Kuju-i06J__sQ0sNqEOD7CcQYeos",
+  authDomain: "ahmed-mostafa-abfef.firebaseapp.com",
+  projectId: "ahmed-mostafa-abfef",
+  storageBucket: "ahmed-mostafa-abfef.firebasestorage.app",
+  messagingSenderId: "542458359790",
+  appId: "1:542458359790:web:2c3a8b06e5c7e89df528ff",
+  measurementId: "G-18FBMGFYJJ"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const workoutsList = document.getElementById("workoutsList");
+const expiredMsg = document.getElementById("expired");
+
+onAuthStateChanged(auth, async user => {
+    if(!user) return window.location.href = "login.html";
+
+    const userRef = doc(db, "users", user.uid);
+
+    onSnapshot(userRef, snap => {
+        if(!snap.exists()){
+            workoutsList.innerHTML = "<p class='no-workouts'>لا يوجد بيانات لحسابك.</p>";
+            return;
+        }
+
+        const userData = snap.data();
+
+        // فحص الاشتراك باستخدام timer (timestamp)
+        let timerTime = userData.timer?.toDate ? 
+                        userData.timer.toDate().getTime() : 
+                        new Date(userData.timer).getTime();
+
+        if(Date.now() > timerTime){
+            expiredMsg.style.display = "block";
+            workoutsList.innerHTML = "";
+            return;
+        } else {
+            expiredMsg.style.display = "none";
+        }
+
+        // تحميل التمارين
+        const workoutRef = doc(db, "userWorkouts", user.uid);
+        onSnapshot(workoutRef, wsnap => {
+            workoutsList.innerHTML = "";
+
+            if(!wsnap.exists() || !wsnap.data().workouts || wsnap.data().workouts.length === 0){
+                workoutsList.innerHTML = "<p class='no-workouts'>لا يوجد تمارين حالياً.</p>";
+                return;
+            }
+
+            wsnap.data().workouts.forEach(w => {
+                let card = document.createElement("div");
+                card.className = "workout-card";
+                card.innerHTML = `
+                    <h3>${w.title}</h3>
+                    <p>${w.desc || ""}</p>
+                    ${w.video ? `<a class="video-btn" href="${w.video}" target="_blank">مشاهدة الفيديو</a>` : ""}
+                `;
+                workoutsList.appendChild(card);
+            });
+        });
+
+    });
+});
+</script>
+
+</body>
+</html>

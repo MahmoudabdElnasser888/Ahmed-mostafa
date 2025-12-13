@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تواصل معنا</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body{
+    min-height:100vh;
+    background: linear-gradient(135deg,#000000,#432020,#922121);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    color:#fff;
+    overflow-x:hidden;
+}
+
+h1{
+    font-size:2.5rem;
+    text-align:center;
+    margin-bottom:20px;
+    position:relative;
+    animation: fadeInDown 1s ease forwards;
+}
+
+h1::after{
+    content:'';
+    position:absolute;
+    left:50%;
+    bottom:-10px;
+    transform:translateX(-50%);
+    width:0;
+    height:3px;
+    background:#ff0000;
+    border-radius:5px;
+    animation: lineGrow 1s ease 0.5s forwards;
+}
+
+.container{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:20px;
+    max-width:900px;
+}
+
+/* البطاقة كلها clickable */
+.card{
+    background:rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    border-radius:15px;
+    width:200px;
+    padding:30px 20px;
+    text-align:center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+    cursor:pointer;
+    position:relative;
+    overflow:hidden;
+    text-decoration:none;
+    color:#fff;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+}
+
+.card:hover{
+    transform: translateY(-10px) scale(1.05);
+    box-shadow: 0 15px 30px rgba(255,0,0,0.5);
+    background: rgba(255,0,0,0.2);
+}
+
+.card:active{
+    transform: scale(0.97);
+    box-shadow: 0 5px 15px rgba(255,0,0,0.5);
+}
+
+.card i{
+    font-size:2.5rem;
+    margin-bottom:15px;
+    color:#ff0000;
+    transition: transform 0.3s ease;
+}
+
+.card:hover i{
+    transform: rotate(20deg) scale(1.2);
+}
+
+.card h3{
+    margin-bottom:10px;
+    font-size:1.2rem;
+}
+
+.card p{
+    font-size:0.9rem;
+    color:#ddd;
+}
+
+@keyframes fadeInDown{
+    0%{opacity:0; transform:translateY(-50px);}
+    100%{opacity:1; transform:translateY(0);}
+}
+
+@keyframes lineGrow{
+    0%{width:0;}
+    100%{width:80px;}
+}
+
+@media(max-width:600px){
+    .container{
+        flex-direction:column;
+        align-items:center;
+    }
+}
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+
+<h1>تواصل معنا</h1>
+
+<div class="container">
+    <a class="card" href="mailto:yourmail@example.com">
+        <i class="fas fa-envelope"></i>
+        <h3>الإيميل</h3>
+        <p>yourmail@example.com</p>
+    </a>
+    <a class="card" href="https://wa.me/201234567890" target="_blank">
+        <i class="fab fa-whatsapp"></i>
+        <h3>واتساب</h3>
+        <p>+201234567890</p>
+    </a>
+    <a class="card" href="https://facebook.com/yourpage" target="_blank">
+        <i class="fab fa-facebook-f"></i>
+        <h3>فيسبوك</h3>
+        <p>facebook.com/yourpage</p>
+    </a>
+    <a class="card" href="https://instagram.com/yourpage" target="_blank">
+        <i class="fab fa-instagram"></i>
+        <h3>إنستجرام</h3>
+        <p>instagram.com/yourpage</p>
+    </a>
+</div>
+
+</body>
+</html>

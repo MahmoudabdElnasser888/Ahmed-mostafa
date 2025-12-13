@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>روابطنا الرسمية</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+  body{
+    margin:0;
+    font-family:'Poppins',sans-serif;
+    background: linear-gradient(135deg,#000000,#432020,#7a1e1e);
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    min-height:100vh;
+    padding:40px 20px;
+    color:#fff;
+  }
+
+  .container{
+    max-width:900px;
+    width:100%;
+    display:grid;
+    grid-template-columns: repeat(auto-fit,minmax(240px,1fr));
+    gap:20px;
+  }
+
+  h1{
+    text-align:center;
+    width:100%;
+    margin-bottom:30px;
+    font-size:2rem;
+    color:#ff3b3b;
+  }
+
+  .card{
+    background: rgba(255,255,255,0.1);
+    border-radius:15px;
+    padding:20px;
+    display:flex;
+    align-items:center;
+    gap:15px;
+    text-decoration:none;
+    color:#fff;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+  }
+
+  .card:hover{
+    transform: translateY(-8px);
+    box-shadow: 0 12px 25px rgba(255,0,0,0.5);
+    background: rgba(255,59,59,0.15);
+  }
+
+  .icon{
+    font-size:2rem;
+    color:#ff3b3b;
+    width:50px;
+    text-align:center;
+  }
+
+  .meta h3{
+    margin:0;
+    font-size:1.1rem;
+  }
+  .meta p{
+    margin:3px 0 0 0;
+    font-size:0.85rem;
+    color: #ddd;
+  }
+
+  @media(max-width:600px){
+    .container{
+      grid-template-columns: 1fr;
+    }
+  }
+
+</style>
+</head>
+<body>
+
+<h1>روابطنا الرسمية</h1>
+<div class="container">
+  <a class="card" href="https://yourdomain.com" target="_blank">
+    <div class="icon"><i class="fa-solid fa-globe"></i></div>
+    <div class="meta">
+      <h3>CrazyGym </h3>
+      <p>الصفحة الرسمية و يمكن من خلالها الاشتراك في الجيم</p>
+    </div>
+  </a>
+
+  <a class="card" href="https://yourdomain.com/content" target="_blank">
+    <div class="icon"><i class="fa-solid fa-person"></i></div>
+    <div class="meta">
+      <h3>CrazyGym For Men</h3>
+      <p>الصفحه الرسميه للتدرب مع مدربين كريزي جيم (Mix Virsion)</p>
+    </div>
+  </a>
+
+  <a class="card" href="https://yourdomain.com/shop" target="_blank">
+    <div class="icon"><i class="fa-solid fa-person-dress"></i></div>
+    <div class="meta">
+      <h3>CrazyGym For Girls</h3>
+      <p>الصحفه الرسميه للتدرب مع مدربات كريزي جيم (نسخه للنساء فقط)</p>
+    </div>
+  </a>
+</div>
+
+</body>
+</html>

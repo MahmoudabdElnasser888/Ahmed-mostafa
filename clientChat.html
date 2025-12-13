@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>شات العميل</title>
+
+<style>
+  *{box-sizing:border-box;}
+
+  body{
+    margin:0;
+    font-family:"Tajawal", Arial, sans-serif;
+    background:#050505;
+    color:#fff;
+    display:flex;
+    flex-direction:column;
+    height:100vh;
+  }
+
+  /* ===== HEADER ===== */
+  #chatHeader{
+    padding:10px 14px;
+    background:#080808;
+    border-bottom:1px solid #1c1c1c;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    min-height:60px;
+  }
+  #chatHeader img{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    border:2px solid #a51414;
+    object-fit:cover;
+  }
+  .header-info{
+    display:flex;
+    flex-direction:column;
+    font-size:14px;
+  }
+  .header-name{
+    font-weight:600;
+  }
+  .header-status{
+    font-size:12px;
+    color:#aaa;
+  }
+
+  /* ===== الرسائل ===== */
+  #chatMessages{
+    flex:1;
+    padding:12px;
+    overflow-y:auto;
+    background:#0b0b0b;
+  }
+
+  .bubble{
+    padding:8px 12px;
+    margin:8px 0;
+    max-width:75%;
+    border-radius:14px;
+    position:relative;
+    font-size:14px;
+    line-height:1.6;
+    word-wrap:break-word;
+    cursor:pointer;
+  }
+  .me{
+    background:#a51414;
+    margin-left:auto;
+    border-bottom-right-radius:3px;
+  }
+  .them{
+    background:#242424;
+    margin-right:auto;
+    border-bottom-left-radius:3px;
+  }
+
+  .bubble img{
+    max-width:220px;
+    border-radius:10px;
+    display:block;
+  }
+
+  .reply-box{
+    font-size:11px;
+    padding:4px 8px;
+    border-right:3px solid #ffd66b;
+    border-radius:10px;
+    background:rgba(0,0,0,0.3);
+    margin-bottom:4px;
+  }
+  .reply-from{
+    color:#ffd66b;
+    margin-bottom:2px;
+  }
+  .reply-text{
+    color:#eee;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+
+  .time{
+    font-size:10px;
+    color:#ddd;
+    margin-top:4px;
+    text-align:left;
+    opacity:0.75;
+  }
+
+  /* ===== PREVIEW REPLY ===== */
+  #replyPreview{
+    display:none;
+    align-items:center;
+    gap:8px;
+    padding:6px 10px;
+    background:#101010;
+    border-top:1px solid #1f1f1f;
+    border-bottom:1px solid #1f1f1f;
+  }
+  #replyPreview-text{
+    flex:1;
+    font-size:12px;
+  }
+  #replyPreview-title{
+    font-size:11px;
+    color:#ffd66b;
+  }
+  #replyPreview-body{
+    font-size:12px;
+    color:#eee;
+  }
+  #replyPreview-close{
+    border:none;
+    background:transparent;
+    color:#fff;
+    cursor:pointer;
+    font-size:18px;
+  }
+
+  /* ===== INPUT ===== */
+  #chatInputBox{
+    padding:8px;
+    background:#080808;
+    border-top:1px solid #1c1c1c;
+    display:flex;
+    gap:8px;
+  }
+  #msgInput{
+    flex:1;
+    padding:10px;
+    border-radius:10px;
+    border:none;
+    font-size:14px;
+  }
+  #sendBtn,#imgBtn{
+    padding:0 12px;
+    border:none;
+    border-radius:10px;
+    background:#a51414;
+    color:#fff;
+    cursor:pointer;
+    font-size:15px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  /* ===== موبايل ===== */
+  @media(max-width:768px){
+    #chatMessages{ padding:8px; }
+    .bubble{ max-width:85%; }
+  }
+</style>
+</head>
+<body>
+
+<!-- الهيدر -->
+<div id="chatHeader">
+  جاري تحميل بيانات الكوتش...
+</div>
+
+<!-- الرسائل -->
+<div id="chatMessages"></div>
+
+<!-- معاينة الرد -->
+<div id="replyPreview">
+  <div id="replyPreview-text">
+    <div id="replyPreview-title"></div>
+    <div id="replyPreview-body"></div>
+  </div>
+  <button id="replyPreview-close">✕</button>
+</div>
+
+<!-- الإدخال -->
+<div id="chatInputBox" style="display:none;">
+  <button id="imgBtn">📷</button>
+  <input id="msgInput" placeholder="اكتب رسالة...">
+  <button id="sendBtn">إرسال</button>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { 
+  getFirestore, doc, getDoc, collection, query, where, getDocs,
+  onSnapshot, setDoc, addDoc, orderBy, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+   apiKey: "AIzaSyDYTF1Kuju-i06J__sQ0sNqEOD7CcQYeos",
+  authDomain: "ahmed-mostafa-abfef.firebaseapp.com",
+  projectId: "ahmed-mostafa-abfef",
+  storageBucket: "ahmed-mostafa-abfef.firebasestorage.app",
+  messagingSenderId: "542458359790",
+  appId: "1:542458359790:web:2c3a8b06e5c7e89df528ff",
+  measurementId: "G-18FBMGFYJJ"
+};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+// عناصر DOM
+const chatHeader   = document.getElementById("chatHeader");
+const chatMessages = document.getElementById("chatMessages");
+const chatInputBox = document.getElementById("chatInputBox");
+const msgInput     = document.getElementById("msgInput");
+const sendBtn      = document.getElementById("sendBtn");
+const imgBtn       = document.getElementById("imgBtn");
+
+const replyPreview      = document.getElementById("replyPreview");
+const replyPreviewTitle = document.getElementById("replyPreview-title");
+const replyPreviewBody  = document.getElementById("replyPreview-body");
+const replyPreviewClose = document.getElementById("replyPreview-close");
+
+let USER   = null;
+let COACH  = null;
+let CHAT_ID = null;
+let messagesUnsub = null;
+let replyData = null;
+
+// إلغاء الرد
+function clearReply(){
+  replyData = null;
+  replyPreview.style.display = "none";
+  replyPreviewTitle.textContent = "";
+  replyPreviewBody.textContent  = "";
+}
+
+// تفعيل الرد
+function activateReply(messageData, isMe){
+  const baseText = messageData.text || (messageData.image ? "صورة" : "");
+  const fromName = isMe ? "أنت" : (COACH?.fullName || "coach");
+
+  replyData = { text: baseText, from: fromName };
+
+  replyPreview.style.display = "flex";
+  replyPreviewTitle.textContent = `رد على ${fromName}`;
+  replyPreviewBody.textContent  = baseText;
+}
+
+replyPreviewClose.addEventListener("click", clearReply);
+
+// set online status
+async function setOnline(uid,status){
+  await setDoc(doc(db,"users",uid),{
+    online:status,
+    lastSeen: serverTimestamp()
+  },{merge:true});
+}
+
+// تحميل بيانات الكوتش من coachEmail
+async function loadCoach(coachEmail){
+  const q = query(collection(db,"users"), where("email","==",coachEmail));
+  const snap = await getDocs(q);
+  if(snap.empty){
+    chatHeader.textContent = "لم يتم العثور على الكوتش";
+    return;
+  }
+  const coachDoc = snap.docs[0];
+  COACH = { id: coachDoc.id, ...coachDoc.data() };
+
+  CHAT_ID = `${COACH.id}_${USER.uid}`;
+
+  const img = COACH.image || "https://i.imgur.com/3G0ZQZ9.png";
+  const statusText = COACH.online ? "متصل الآن" : "غير متصل";
+
+  chatHeader.innerHTML = `
+    <img src="${img}">
+    <div class="header-info">
+      <span class="header-name">${COACH.fullName || "الكوتش"}</span>
+      <span class="header-status">${statusText}</span>
+    </div>
+  `;
+
+  chatInputBox.style.display = "flex";
+
+  if(messagesUnsub) messagesUnsub();
+  loadMessages();
+}
+
+// تحميل الرسائل بترتيب ثابت
+function loadMessages(){
+  chatMessages.innerHTML = "";
+  const msgsRef = collection(db,"chats",CHAT_ID,"messages");
+  const q = query(msgsRef, orderBy("time","asc"));
+
+  let firstLoad = true;
+
+  messagesUnsub = onSnapshot(q, snap=>{
+    chatMessages.innerHTML = "";
+
+    snap.forEach(docSnap=>{
+      const data = docSnap.data();
+      const isMe = data.sender === USER.uid;
+
+      const div = document.createElement("div");
+      div.className = "bubble " + (isMe ? "me" : "them");
+
+      // صندوق الريلاي لو موجود
+      if(data.reply && data.reply.text){
+        const rb = document.createElement("div");
+        rb.className = "reply-box";
+        const from = data.reply.from || "رد";
+        rb.innerHTML = `
+          <div class="reply-from">${from}</div>
+          <div class="reply-text">${data.reply.text}</div>
+        `;
+        div.appendChild(rb);
+      }
+
+      // محتوى الرسالة
+      if(data.image){
+        const img = document.createElement("img");
+        img.src = data.image;
+        div.appendChild(img);
+      }else if(data.text){
+        const t = document.createElement("div");
+        t.textContent = data.text;
+        div.appendChild(t);
+      }
+
+      // وقت الإرسال
+      if(data.time && data.time.toDate){
+        const t = document.createElement("div");
+        t.className = "time";
+        t.textContent = data.time.toDate().toLocaleTimeString([],{
+          hour:"2-digit",
+          minute:"2-digit"
+        });
+        div.appendChild(t);
+      }
+
+      // ضغط على الرسالة = تفعيل Reply
+      div.addEventListener("click", ()=> activateReply(data, isMe));
+
+      chatMessages.appendChild(div);
+    });
+
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    if(!firstLoad && snap.size>0){
+      const lastMsg = snap.docs[snap.docs.length-1].data();
+      if(lastMsg.sender !== USER.uid && navigator.vibrate){
+        navigator.vibrate(60);
+      }
+    }
+    firstLoad = false;
+  });
+}
+
+// إرسال رسالة نصية
+async function sendTextMessage(){
+  const txt = msgInput.value.trim();
+  if(!txt || !CHAT_ID) return;
+
+  await addDoc(collection(db,"chats",CHAT_ID,"messages"),{
+    sender: USER.uid,
+    text: txt,
+    image: null,
+    time: serverTimestamp(),         // ترتيب ثابت من السيرفر
+    reply: replyData ? { text: replyData.text, from: replyData.from } : null
+  });
+
+  msgInput.value = "";
+  clearReply();
+}
+
+sendBtn.onclick = sendTextMessage;
+msgInput.addEventListener("keydown", e=>{
+  if(e.key === "Enter" && !e.shiftKey){
+    e.preventDefault();
+    sendTextMessage();
+  }
+});
+
+// إرسال صورة
+imgBtn.onclick = ()=>{
+  if(!CHAT_ID) return;
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "image/*";
+  input.onchange = uploadImage;
+  input.click();
+};
+
+async function uploadImage(e){
+  const file = e.target.files[0];
+  if(!file || !CHAT_ID) return;
+
+  const form = new FormData();
+  form.append("image", file);
+
+  const res = await fetch("https://api.imgbb.com/1/upload?key=230966cc91f42a69e2f64be5097c8b5c",{
+    method:"POST",
+    body:form
+  });
+
+  const data = await res.json();
+  const url = data.data.url;
+
+  await addDoc(collection(db,"chats",CHAT_ID,"messages"),{
+    sender: USER.uid,
+    text: null,
+    image: url,
+    time: serverTimestamp(),
+    reply: replyData ? { text: replyData.text, from: replyData.from } : null
+  });
+
+  clearReply();
+}
+
+// مراقبة تسجيل الدخول
+onAuthStateChanged(auth, async user=>{
+  if(!user) return window.location.href="login.html";
+  USER = user;
+
+  const userDoc = await getDoc(doc(db,"users",user.uid));
+  if(!userDoc.exists()){
+    chatHeader.textContent = "لم يتم العثور على بيانات حسابك";
+    return;
+  }
+  const uData = userDoc.data();
+
+  if(!uData.coachEmail){
+    chatHeader.textContent = "لم يتم تعيين كابتن لك بعد";
+    return;
+  }
+
+  await setOnline(user.uid,true);
+  window.addEventListener("beforeunload", ()=> setOnline(user.uid,false));
+
+  await loadCoach(uData.coachEmail);
+});
+</script>
+
+</body>
+</html>
