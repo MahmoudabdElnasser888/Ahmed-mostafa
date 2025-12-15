@@ -452,9 +452,9 @@ onAuthStateChanged(auth, async user=>{
   }
 
  // ✅🔥 صفّر الإشعارات أول ما يدخل الشات
-  await updateDoc(userRef,{
-    unreadMessages: 0
-  });
+ await updateDoc(doc(db,"users", user.uid),{
+  unreadMessages: 0
+});
 
 
   await setOnline(user.uid,true);

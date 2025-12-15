@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>تنبيه رسائل داخل الصفحة — عميل</title>
+<style>
+  :root{ --bg:#050505; --panel:#0b0b0b; --accent:#a51414; --muted:#a6adb3; --card:#111;}
+  *{box-sizing:border-box}
+  body{ margin:0; font-family:"Tajawal", Arial, sans-serif; background:var(--bg); color:#fff; min-height:100vh; display:flex; flex-direction:column; }
+
+  header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:12px 16px; background:#080808; border-bottom:1px solid rgba(255,255,255,0.03);
+  }
+  .title{ font-weight:700; font-size:16px }
+  .user-info{ font-size:13px; color:var(--muted) }
+
+  main{ flex:1; padding:18px; position:relative; }
+
+  .hint{
+    max-width:1000px; margin:10px auto; padding:12px; border-radius:12px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    color:var(--muted);
+  }
+
+  /* البادج العلوي */
+  #badgeWrap .unread-badge{
+    background:#ffcc33; color:#000; padding:6px 10px; border-radius:999px;
+    font-weight:800; font-size:13px; display:inline-block; min-width:44px; text-align:center;
+  }
+
+  /* صندوق التنبيه (in-body notification) */
+  .notify-box {
+    position: fixed;
+    left: 50%;
+    top: 30%;
+    transform: translate(-50%, -20px) scale(.96);
+    width: min(760px, 92%);
+    background: linear-gradient(180deg, #0f0f10, #070707);
+    border: 1px solid rgba(255,255,255,0.04);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+    border-radius: 14px;
+    z-index: 9999;
+    padding: 18px;
+    display:flex;
+    gap:14px;
+    align-items:flex-start;
+    opacity:0;
+    animation: popIn .22s ease forwards;
+  }
+  @keyframes popIn {
+    to { opacity:1; transform: translate(-50%,0) scale(1); }
+  }
+
+  .notify-left{ width:64px; height:64px; border-radius:12px; background:linear-gradient(135deg,var(--accent),#ff6b6b); display:grid; place-items:center; font-weight:800; font-size:28px; color:#070707; }
+  .notify-body{ flex:1; }
+  .notify-title{ font-weight:800; font-size:16px; margin-bottom:6px; }
+  .notify-text{ color:var(--muted); font-size:14px; max-height:72px; overflow:hidden; text-overflow:ellipsis; }
+  .notify-meta{ margin-top:10px; display:flex; gap:8px; align-items:center; font-size:13px; color:var(--muted); }
+
+  .notify-actions{ display:flex; gap:10px; margin-left:10px; }
+  .btn{ background:var(--accent); color:#fff; padding:8px 12px; border-radius:10px; border:none; cursor:pointer; font-weight:700; }
+  .btn.ghost{ background:transparent; border:1px solid rgba(255,255,255,0.06); color:var(--muted); font-weight:600; }
+
+  /* زر اغلاق صغير */
+  .notify-close{ position:absolute; top:8px; right:10px; background:transparent; border:none; color:var(--muted); font-size:18px; cursor:pointer; }
+
+  /* responsive */
+  @media(max-width:600px){
+    .notify-box{ top:25%; padding:12px; gap:10px; }
+    .notify-left{ width:52px; height:52px; font-size:22px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="title">صفحة العميل</div>
+    <div id="userInfo" class="user-info">جارٍ التحقق من تسجيل الدخول...</div>
+  </div>
+  <div id="badgeWrap"></div>
+</header>
+
+<main>
+  
+
+  <!-- محتوى تجريبي أساسي -->
+  <div style="max-width:1000px;margin:20px auto;color:var(--muted);">
+    مرحبًا! أي رسالة جديدة من الكوتش هتظهر لك هنا كتنبيه داخل الصفحة. اضغط "فتح الشات" للذهاب إلى صفحة الشات.
+  </div>
+
+  <!-- الحاوية التي ستُعرض بداخلها Notifications إضافية إن احتجت -->
+  <div id="notificationList" style="max-width:1000px;margin:8px auto;"></div>
+</main>
+
+<script type="module">
+/* ===== Firebase imports ===== */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import {
+  getFirestore, doc, getDoc, onSnapshot, query, collection, orderBy, limit, getDocs
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+/* ===== Firebase config (استبدل لو لازم) ===== */
+const firebaseConfig = {
+  apiKey: "AIzaSyDYTF1Kuju-i06J__sQ0sNqEOD7CcQYeos",
+  authDomain: "ahmed-mostafa-abfef.firebaseapp.com",
+  projectId: "ahmed-mostafa-abfef",
+  storageBucket: "ahmed-mostafa-abfef.firebasestorage.app",
+  messagingSenderId: "542458359790",
+  appId: "1:542458359790:web:2c3a8b06e5c7e89df528ff",
+  measurementId: "G-18FBMGFYJJ"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+/* ===== UI refs ===== */
+const userInfoEl = document.getElementById('userInfo');
+const badgeWrap = document.getElementById('badgeWrap');
+const notificationList = document.getElementById('notificationList');
+
+let USER = null;
+let userRef = null;
+let prevUnread = null;
+let CHAT_ID = null;
+let coachDoc = null;
+
+/* render badge */
+function renderBadge(count){
+  badgeWrap.innerHTML = count > 0 ? `<span class="unread-badge">${count}</span>` : '';
+}
+
+/* create and show in-body notification box */
+function showInBodyNotification({count, text, time}) {
+  // remove existing if any
+  const prev = document.querySelector('.notify-box');
+  if(prev) prev.remove();
+
+  const box = document.createElement('div');
+  box.className = 'notify-box';
+  box.innerHTML = `
+    <button class="notify-close" aria-label="إغلاق">✕</button>
+    <div class="notify-left">!نص</div>
+    <div class="notify-body">
+      <div class="notify-title">لديك ${count} رسالة${count>1?'ات':''} جديدة</div>
+      <div class="notify-text">${escapeHtml(text || 'لديك رسالة جديدة')}</div>
+      <div class="notify-meta">آخر رسالة: ${time ? new Date(time.seconds*1000).toLocaleString() : 'الآن'}</div>
+    </div>
+    <div class="notify-actions">
+      <button class="btn open">فتح الشات</button>
+      <button class="btn ghost ignore">تجاهل</button>
+    </div>
+  `;
+  document.body.appendChild(box);
+
+  // focus/vibrate
+  if(navigator.vibrate) navigator.vibrate([80,30,80]);
+
+  // handlers
+  box.querySelector('.notify-close').addEventListener('click', ()=> box.remove());
+  box.querySelector('.ignore').addEventListener('click', ()=> box.remove());
+  box.querySelector('.open').addEventListener('click', async ()=>{
+    // صفّر العداد ثم اذهب للشات
+    await clearUnreadAndGoChat();
+  });
+}
+
+/* helper: escapeHtml for safety */
+function escapeHtml(s){
+  if(!s) return '';
+  return s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');
+}
+
+/* set unread to 0 then navigate to chat page */
+async function clearUnreadAndGoChat(){
+  if(!userRef) return window.location.href = 'chat.html';
+  try{
+    // وضع قيمة 0 مباشرة
+    await userRef.ref.update?.({ unreadMessages: 0 }); // try if wrapper supports .ref.update (no), fallback below
+  }catch(e){ /* ignore */ }
+  // fallback to direct update via updateDoc import not included; use REST-like approach: call a small patch via client Firestore isn't available here.
+  // Simpler: navigate to chat and let chat page clear the counter when opened.
+  window.location.href = 'chat.html';
+}
+
+/* get latest message from chat (limit 1 desc) */
+async function fetchLatestMessageForChat(chatId){
+  try{
+    const msgsRef = collection(db, 'chats', chatId, 'messages');
+    const q = query(msgsRef, orderBy('time','desc'), limit(1));
+    const snap = await getDocs(q);
+    if(snap.empty) return null;
+    return snap.docs[0].data();
+  }catch(err){
+    console.warn('fetchLatestMessageForChat err', err);
+    return null;
+  }
+}
+
+/* Main: monitor auth -> user doc -> show in-body notification when unread increases */
+onAuthStateChanged(auth, async (user) => {
+  if(!user){
+    userInfoEl.textContent = 'غير مسجل الدخول — الرجاء تسجيل الدخول';
+    return;
+  }
+  USER = user;
+  userInfoEl.textContent = `مرحبًا — ${user.email || user.uid}`;
+
+  // مرجع مستند المستخدم
+  userRef = doc(db, 'users', user.uid);
+
+  // read initial user doc to get coachEmail and initial unread
+  const userSnap = await getDoc(userRef);
+  if(!userSnap.exists()){
+    userInfoEl.textContent = 'بيانات المستخدم غير موجودة في users/{uid}';
+    return;
+  }
+  const udata = userSnap.data();
+  const coachEmail = udata.coachEmail;
+  const initialUnread = typeof udata.unreadMessages === 'number' ? udata.unreadMessages : 0;
+  prevUnread = initialUnread;
+  renderBadge(initialUnread);
+
+  // find coach doc by email (to compute chat id)
+  if(coachEmail){
+    const q = query(collection(db,'users'), where('email','==', coachEmail));
+    const qSnap = await getDocs(q);
+    if(!qSnap.empty){
+      coachDoc = { id: qSnap.docs[0].id, ...qSnap.docs[0].data() };
+      CHAT_ID = `${coachDoc.id}_${USER.uid}`;
+    }
+  }
+
+  // subscribe to realtime changes on user's doc
+  onSnapshot(userRef, async (snap) => {
+    if(!snap.exists()) return;
+    const data = snap.data();
+    const unread = typeof data.unreadMessages === 'number' ? data.unreadMessages : 0;
+
+    // show notification only when unread increased (ولا عند أول تحميل)
+    if(prevUnread !== null && unread > prevUnread){
+      const diff = unread - prevUnread;
+
+      // حاول نجيب آخر رسالة الواقعية من الشات لو عندنا chat id
+      let preview = 'لديك رسالة جديدة';
+      let time = null;
+      if(CHAT_ID){
+        const lastMsg = await fetchLatestMessageForChat(CHAT_ID);
+        if(lastMsg && lastMsg.sender !== USER.uid){
+          preview = lastMsg.text || (lastMsg.image ? '[صورة]' : preview);
+          time = lastMsg.time || null;
+        }
+      }
+
+      // أظهر التنبيه داخل الصفحة
+      showInBodyNotification({ count: diff, text: preview, time });
+    }
+
+    // حدث البادج والقيمة السابقة
+    renderBadge(unread);
+    prevUnread = unread;
+  });
+});
+</script>
+</body>
+</html>

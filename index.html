@@ -881,23 +881,178 @@
 
 
 
-
-.notif{ position:relative }
-.badge{
-  position:absolute;
-  top:-6px; right:-6px;
-  background:red;
+.notify-icon{
+  position:relative;
+  font-size:22px;
+  cursor:pointer;
   color:#fff;
-  font-size:11px;
+}
+
+.notify-badge{
+  position:absolute;
+  top:-6px;
+  right:-8px;
+  background:#ffcc33;
+  color:#000;
+  font-size:12px;
+  font-weight:800;
   padding:2px 6px;
-  border-radius:50%;
+  border-radius:999px;
+  min-width:20px;
+  text-align:center;
+}
+
+.hero{
+  position:relative;
+  height:100vh;
+  background:url('hero.jpg') center/cover no-repeat;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+}
+
+.hero-overlay{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(
+    to bottom,
+    rgba(0,0,0,.8),
+    rgba(0,0,0,.5),
+    rgba(0,0,0,.9)
+  );
+}
+
+.hero-content{
+  position:relative;
+  z-index:2;
+  text-align:center;
+  max-width:650px;
+  padding:20px;
+}
+
+.hero-content h1{
+  font-size:46px;
+  font-weight:900;
+  line-height:1.2;
+  margin-bottom:20px;
+}
+
+.hero-content h1 span{
+  color:#d12323;
+}
+
+.hero-content p{
+  font-size:17px;
+  opacity:.9;
+  margin-bottom:30px;
+}
+
+.hero-content button{
+  background:#ce0f0f;
+  color:#000;
+  border:none;
+  padding:14px 30px;
+  font-size:16px;
+  font-weight:800;
+  border-radius:40px;
+  cursor:pointer;
+  transition:.3s;
+}
+
+.hero-content button:hover{
+  transform:translateY(-3px);
+  box-shadow:0 10px 30px rgba(255,204,51,.4);
 }
 
 
 
+.coach{
+  background:#070707;
+  padding:100px 20px;
+}
+
+.coach-wrap{
+  max-width:1100px;
+  margin:auto;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:60px;
+  align-items:center;
+}
+
+.coach-image{
+  position:relative;
+}
+
+.coach-image img{
+  width:100%;
+  border-radius:18px;
+  filter:contrast(1.05) brightness(.95);
+}
+
+.coach-image::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:18px;
+  background:linear-gradient(180deg,transparent,rgba(0,0,0,.6));
+}
+
+.coach-eyebrow{
+  color:#ce0f0f;
+  font-size:13px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+}
+
+.coach-content h2{
+  margin:12px 0 20px;
+  font-size:36px;
+  color:#fff;
+}
+
+.coach-desc{
+  font-size:17px;
+  line-height:1.7;
+  color:#ddd;
+}
+
+.coach-desc.muted{
+  color:#999;
+  margin-top:10px;
+}
+
+.coach-stats{
+  display:flex;
+  gap:30px;
+  margin-top:30px;
+  list-style:none;
+  padding:0;
+}
+
+.coach-stats li{
+  font-size:14px;
+  color:#aaa;
+}
+
+.coach-stats strong{
+  display:block;
+  font-size:22px;
+  color:#ce0f0f;
+}
 
 
+@media(max-width:768px){
+  .coach-wrap{
+    grid-template-columns:1fr;
+    text-align:center;
+  }
 
+  .coach-stats{
+    justify-content:center;
+  }
+}
 
 
 
@@ -915,12 +1070,10 @@
   
   <div class="icons">
 
-   <div class="notif">
-  <i class="fa-solid fa-bell"></i>
-  <span id="notifCount" class="badge" style="display:none">0</span>
-</div>
-
-
+    <div id="notifyBtn" class="notify-icon">
+      🔔
+      <span id="notifyBadge" class="notify-badge" style="display:none;">0</span>
+    </div>
     <!-- userBtn هنا -->
     <!-- menuBtn هنا -->
 
@@ -982,12 +1135,26 @@
 
 <div class="overlay" id="overlay" aria-hidden="true"></div>
 </div>
+<section class="hero">
+  <div class="hero-overlay"></div>
 
-<div class="people">
-  <div class="person"><a href=""><img src="صورة_واتساب_بتاريخ_1447-05-22_في_01.13.06_aa2f5df6-removebg-preview.png"></div></a>
-</div>
+  <div class="hero-content">
+    <h1>
+     Discipline,
+     Structure,
+      <span>Results</span>
+    </h1>
 
-<section class="problem-section">
+    <p>
+     No shortcuts. No excuses
+    </p>
+
+    <button onclick="document.getElementById('pr').scrollIntoView({behavior:'smooth'})">Start Now Start Tody</button>
+  </div>
+</section>
+
+
+<section id="pr" class="problem-section">
   <div class="container">
     <h2 class="problem-title">ليه معظمنا مش بنوصل لشكل الجسم اللي عايزينه؟</h2>
 
@@ -1015,31 +1182,38 @@
   </div>
 </section>
 
-<section class="proplem-solution">
-  <div class="ps-container">
-    <div class="ps-proplem">
-      <h2 class="ps-title">The Problem <span>المشكلة</span></h2>
-      <p class="ps-text">
-         Most guys struggle with losing fat without losing muscle — 
-        أغلب الشباب بيعاني إنه ينشف من غير ما يخسر كتلة عضلية.
-        <br><br>
-        Training plans online are confusing, nutrition is messy, 
-        and progress feels slow — والخطط المنتشرة مش بتدي نتيجة واضحة.
-      </p>
+<section class="coach">
+  <div class="coach-wrap">
 
-      <div class="ps-arrow">→</div>
-
-    <div class="ps-solution">
-      <h2 class="ps-title sol">The Solution <span>الحل</span></h2>
-      <p class="ps-text">
-        We built a full step-by-step system designed for YOU —
-        عملنالك نظام كامل، تدريبات + دايت + متابعة، كل ده جاهز ليك على طبق من دهب.
-        <br><br>
-        Fast, clear, and personalized — كله محسوب على هدفك بدقة.
-      </p>
+    <div class="coach-image">
+      <img src="Screenshot 2025-11-15 221539.png" alt="Coach Ahmed Mostafa">
     </div>
+
+    <div class="coach-content">
+      <span class="coach-eyebrow">The Mind Behind The System</span>
+
+      <h2>Coach Ahmed Mostafa</h2>
+
+      <p class="coach-desc">
+        I don’t train bodies.<br>
+        I build discipline, structure, and men who don’t quit.
+      </p>
+
+      <p class="coach-desc muted">
+        No random workouts. No copy-paste plans.<br>
+        Every step here exists for a reason.
+      </p>
+
+      <ul class="coach-stats">
+        <li><strong>4+</strong> Years Experience</li>
+        <li><strong>100%</strong> Results Focused</li>
+      </ul>
+
+    </div>
+
   </div>
 </section>
+
 
 
 <section class="before-after">
@@ -1189,6 +1363,8 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
   import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
 
   const firebaseConfig = {
     apiKey: "AIzaSyDYTF1Kuju-i06J__sQ0sNqEOD7CcQYeos",
@@ -1211,6 +1387,9 @@
   const chatLink = document.getElementById('chatLink');
   const chatBadge = document.getElementById('chatBadge');
   const chatLabel = document.getElementById('chatLabel');
+  const notifyBtn = document.getElementById('notifyBtn');
+  const notifyBadge = document.getElementById('notifyBadge');
+
 
   // open/close sidebar with smooth animation
   menuBtn.addEventListener('click', () => {
@@ -1287,6 +1466,23 @@
       return;
     }
 
+    // 🔔 مراقبة عدد الرسائل غير المقروءة
+const userDocRef = doc(db, 'users', user.uid);
+
+onSnapshot(userDocRef, (snap)=>{
+  if(!snap.exists()) return;
+
+  const unread = snap.data().unreadMessages || 0;
+
+  if(unread > 0){
+    notifyBadge.style.display = 'block';
+    notifyBadge.textContent = unread;
+  }else{
+    notifyBadge.style.display = 'none';
+  }
+});
+
+
     // user logged: try show user photo or initials avatar
     // try to read users doc first for image url
     const uRef = doc(db,'users',user.uid);
@@ -1339,43 +1535,9 @@
     }
   });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
- import { onSnapshot, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-const notifCount = document.getElementById("notifCount");
-
-onAuthStateChanged(auth, user=>{
-  if(!user) return;
-
-  const userRef = doc(db,"users",user.uid);
-
-  onSnapshot(userRef, snap=>{
-    if(!snap.exists()) return;
-
-    const data = snap.data();
-    const count = data.unreadMessages || 0;
-
-    if(count > 0){
-      notifCount.style.display = "block";
-      notifCount.textContent = count;
-    }else{
-      notifCount.style.display = "none";
-    }
-  });
+  notifyBtn.addEventListener('click', ()=>{
+  window.location.href = 'inbox.html';
 });
-
 
 </script>
 </body>
