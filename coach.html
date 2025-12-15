@@ -282,6 +282,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { increment, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { 
   getFirestore, doc, getDoc, setDoc,
@@ -503,6 +504,11 @@ async function sendTextMessage(){
     reply: replyData ? { text: replyData.text, from: replyData.from } : null
   });
 
+  // 🔔 زوّد عداد الرسائل غير المقروءة عند العميل
+  await updateDoc(doc(db,"users", CURRENT_CLIENT.id),{
+    unreadMessages: increment(1)
+  });
+
   msgInput.value = "";
   clearReply();
 }
@@ -546,6 +552,12 @@ async function uploadImage(e){
     reply: replyData ? { text: replyData.text, from: replyData.from } : null
   });
 
+
+ await updateDoc(doc(db,"users", CURRENT_CLIENT.id),{
+  unreadMessages: increment(1)
+});
+
+
   clearReply();
 }
 
@@ -563,33 +575,6 @@ onAuthStateChanged(auth, async user=>{
 
   loadCoachClients(user.email);
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-import { increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-await addDoc(collection(db,"messages"),{
-  text: message,
-  from: coachUid,
-  to: clientUid,
-  createdAt: serverTimestamp()
-});
-
-// زود العداد عند العميل
-await updateDoc(doc(db,"users",clientUid),{
-  unreadMessages: increment(1)
-});
-
 </script>
 
 </body>

@@ -882,23 +882,17 @@
 
 
 
-
-.notif {
-  position: relative;
-  font-size: 26px;
-  cursor: pointer;
+.notif{ position:relative }
+.badge{
+  position:absolute;
+  top:-6px; right:-6px;
+  background:red;
+  color:#fff;
+  font-size:11px;
+  padding:2px 6px;
+  border-radius:50%;
 }
 
-.count {
-  position: absolute;
-  top: -6px;
-  right: -8px;
-  background: red;
-  color: #fff;
-  font-size: 12px;
-  padding: 2px 6px;
-  border-radius: 50%;
-}
 
 
 
@@ -921,10 +915,11 @@
   
   <div class="icons">
 
-    <div class="notif">
-  🔔
-  <span id="notifCount" class="count" style="display:none">0</span>
+   <div class="notif">
+  <i class="fa-solid fa-bell"></i>
+  <span id="notifCount" class="badge" style="display:none">0</span>
 </div>
+
 
     <!-- userBtn هنا -->
     <!-- menuBtn هنا -->
@@ -1357,25 +1352,30 @@
 
 
 
-  import { onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+ import { onSnapshot, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const notifCount = document.getElementById("notifCount");
 
-onAuthStateChanged(auth, user => {
+onAuthStateChanged(auth, user=>{
   if(!user) return;
 
   const userRef = doc(db,"users",user.uid);
 
-  onSnapshot(userRef, snap => {
+  onSnapshot(userRef, snap=>{
+    if(!snap.exists()) return;
+
     const data = snap.data();
-    if(data.unreadMessages > 0){
+    const count = data.unreadMessages || 0;
+
+    if(count > 0){
       notifCount.style.display = "block";
-      notifCount.textContent = data.unreadMessages;
-    } else {
+      notifCount.textContent = count;
+    }else{
       notifCount.style.display = "none";
     }
   });
 });
+
 
 </script>
 </body>
