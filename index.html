@@ -3,7 +3,11 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>CrazyGym-Online(Home)</title>
+<link rel="icon" href="favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="تصميم_بدون_عنوان__10_-removebg-preview.png">
+<link rel="icon" type="image/png" sizes="16x16" href="تصميم_بدون_عنوان__10_-removebg-preview.png">
+
+<title>Ahmed-Mostafa(Home)</title>
 
 <!-- Font Awesome CDN (no CORS issue on localhost) -->
 <link rel="stylesheet"
@@ -46,17 +50,16 @@
 
   /* logo */
   .logo{
-    display:flex;
-    align-items:center;
-    gap:12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
   }
   .logo img{
-    height:52px;
+    height:50px;
     width:auto;
-    border-radius:10px;
     transform-origin:center;
     transition: transform .45s ease;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+    
   }
   .logo:hover img{ transform: rotate(-6deg) scale(1.03); }
 
@@ -161,9 +164,10 @@
 
 .person {
   position: relative;
-  margin-left: -150px; /* <-- ده اللي بيعمل التداخل */
+  margin-left: 600px; /* <-- ده اللي بيعمل التداخل */
   transition: .4s ease;
   cursor: pointer;
+  margin-bottom: 65px;
 }
 
 .person:first-child {
@@ -669,7 +673,7 @@
     padding: 10px 12px;
     gap: 8px;
   }
-  .logo img { height: 40px; }
+  .logo img { height: 60px; }
   .site-title .tag { display: none; } /* save space */
   .icons { gap: 8px; }
   .icon-btn { width:40px; height:40px; }
@@ -879,6 +883,27 @@
 
 
 
+.notif {
+  position: relative;
+  font-size: 26px;
+  cursor: pointer;
+}
+
+.count {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  background: red;
+  color: #fff;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 50%;
+}
+
+
+
+
+
 
 
 
@@ -888,13 +913,19 @@
 
 <header>
   <div class="logo">
-    <img src="crazygyml-logo.png" alt="logo">
+    <img src="تصميم_بدون_عنوان__10_-removebg-preview.png" alt="logo">
     <div class="site-title">
       <div class="tag">Fitness • Coaching • Confidence</div>
     </div>
   </div>
   
   <div class="icons">
+
+    <div class="notif">
+  🔔
+  <span id="notifCount" class="count" style="display:none">0</span>
+</div>
+
     <!-- userBtn هنا -->
     <!-- menuBtn هنا -->
 
@@ -947,11 +978,8 @@
       </div>
     </a>
 
-    <a class="link" href="about-coach.html">Our coaches <i class="fa-solid fa-dumbbell" style="margin-left:auto"></i></a>
     <a class="link" href="profile.html">Profile <i class="fa-solid fa-user" style="margin-left:auto"></i></a>
-    <a class="link" href="links.html"> Another Websites <i class="fa-solid fa-link" style="margin-left:auto"></i></a>
     <a class="link" href="contact.html">Contact us <i class="fa-solid fa-envelope" style="margin-left:auto"></i></a>
-    <a class="link" href="deal.html">offers <i class="fa-solid fa-gift" style="margin-left:auto"></i></a>
     <a class="link" href="workouts.html">Exercises<i class="fa-solid fa-dumbbell" style="margin-left:auto"></i></a>
   </nav>
 
@@ -961,12 +989,7 @@
 </div>
 
 <div class="people">
-  <div class="person"><a href=""><img src="ChatGPT Image Oct 14, 2025, 04_28_41 PM.png"></div></a>
-  <div class="person"><a href=""><img src="ChatGPT Image Oct 14, 2025, 04_28_41 PM.png"></div></a>
-  <div class="person"><a href=""><img src="ChatGPT Image Oct 14, 2025, 04_28_41 PM.png"></div></a>
-  <div class="person"><a href=""><img src="ChatGPT Image Oct 14, 2025, 04_28_41 PM.png"></div></a>
-  <div class="person"><a href=""><img src="ChatGPT Image Oct 14, 2025, 04_28_41 PM.png"></div></a>
-  <div class="person"><a href=""><img src="ChatGPT Image Oct 14, 2025, 04_28_41 PM.png"></div></a>
+  <div class="person"><a href=""><img src="صورة_واتساب_بتاريخ_1447-05-22_في_01.13.06_aa2f5df6-removebg-preview.png"></div></a>
 </div>
 
 <section class="problem-section">
@@ -1039,11 +1062,11 @@
     <!-- Card 1 -->
     <div class="ba-card">
       <div class="ba-img before">
-        <img src="before1.jpg" alt="Before">
+        <img src="hu11.png" alt="Before">
         <span class="comment">Before</span>
       </div>
       <div class="ba-img after">
-        <img src="after1.jpg" alt="After">
+        <img src="hu12.png" alt="After">
         <span class="comment">After</span>
       </div>
     </div>
@@ -1051,11 +1074,11 @@
     <!-- Card 2 -->
     <div class="ba-card">
       <div class="ba-img before">
-        <img src="before2.jpg" alt="Before">
+        <img src="hu21.png" alt="Before">
         <span class="comment">Before</span>
       </div>
       <div class="ba-img after">
-        <img src="after2.jpg" alt="After">
+        <img src="Screenshot 2025-11-18 003645.png" alt="After">
         <span class="comment">After</span>
       </div>
     </div>
@@ -1063,11 +1086,11 @@
     <!-- Card 3 -->
     <div class="ba-card">
       <div class="ba-img before">
-        <img src="ChatGPT Image Oct 14, 2025, 04_28_41 PM.png" alt="Before">
+        <img src="ah1.png" alt="Before">
         <span class="comment">Before</span>
       </div>
       <div class="ba-img after">
-        <img src="ChatGPT Image Oct 14, 2025, 04_28_41 PM.png" alt="After">
+        <img src="ah2.png" alt="After">
         <span class="comment">After</span>
       </div>
     </div>
@@ -1090,7 +1113,7 @@
     <!-- Plan 1 -->
     <div class="price-card">
       <h3 class="plan-title">Basic Plan</h3>
-      <div class="plan-price">299 EGP <span>/ شهر</span></div>
+      <div class="plan-price">700 EGP <span>/ شهر</span></div>
       <ul class="features">
         <li>برنامج تدريب شهري</li>
         <li>متابعة كل 10 أيام</li>
@@ -1098,7 +1121,7 @@
         <li>دعم عبر واتساب</li>
       </ul>
       <a 
-        href="https://wa.me/201000000000?text=مرحبًا،%20أريد%20الاشتراك%20في%20الباقة%20الأساسية" 
+        href="https://wa.me/201225621565?text=مرحبًا،%20أريد%20الاشتراك%20في%20الباقة%20الأساسية" 
         class="subscribe-btn"
         target="_blank">اشترك الآن</a>
     </div>
@@ -1107,7 +1130,7 @@
     <div class="price-card popular">
       <div class="popular-tag">MOST POPULAR</div>
       <h3 class="plan-title">Pro Plan</h3>
-      <div class="plan-price">499 EGP <span>/ شهر</span></div>
+      <div class="plan-price">1200 EGP <span>/ شهرين</span></div>
       <ul class="features">
         <li>برنامج مخصص حسب هدفك</li>
         <li>متابعة أسبوعية</li>
@@ -1116,7 +1139,7 @@
         <li>دعم VIP</li>
       </ul>
       <a 
-        href="https://wa.me/201000000000?text=مرحبًا،%20أريد%20الاشتراك%20في%20الباقة%20الـ%20Pro" 
+        href="https://wa.me/201225621565?text=مرحبًا،%20أريد%20الاشتراك%20في%20الباقة%20الـ%20Pro" 
         class="subscribe-btn"
         target="_blank">اشترك الآن</a>
     </div>
@@ -1124,7 +1147,7 @@
     <!-- Plan 3 -->
     <div class="price-card">
       <h3 class="plan-title">Elite Plan</h3>
-      <div class="plan-price">799 EGP <span>/ شهر</span></div>
+      <div class="plan-price">1500 EGP <span>/ ثلاث اشهر</span></div>
       <ul class="features">
         <li>برنامج + تغذية Premium</li>
         <li>متابعة يومية</li>
@@ -1133,7 +1156,7 @@
         <li>دعم شخصي 24/7</li>
       </ul>
       <a 
-        href="https://wa.me/201000000000?text=مرحبًا،%20أريد%20الاشتراك%20في%20الباقة%20Elite" 
+        href="https://wa.me/201225621565?text=مرحبًا،%20أريد%20الاشتراك%20في%20الباقة%20Elite" 
         class="subscribe-btn"
         target="_blank">اشترك الآن</a>
     </div>
@@ -1143,23 +1166,21 @@
 <footer class="footer">
   <div class="footer-content">
      <div class="social">
-      <a href="#"><i class="fa-brands fa-facebook"></i></a>
-      <a href="#"><i class="fa-brands fa-instagram"></i></a>
-      <a href="#"><i class="fa-brands fa-tiktok"></i></a>
-      <a href="#"><i class="fa-brands fa-youtube"></i></a>
+      <a href="https://wa.me/201225621565" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
+      <a href="https://www.instagram.com/_c_ahmed_mostafa/"><i class="fa-brands fa-instagram"></i></a>
+      <a href="https://www.tiktok.com/@ahmed_mostafa2.1?is_from_webapp=1&sender_device=pc"><i class="fa-brands fa-tiktok"></i></a>
     </div>
 
     <div class="footer-logo">
       <a href="">
       <img src="WMS-removebg-preview.png" alt="Logo">
       </a>
-      <img src="crazygyml-logo.png" alt="Logo">
       <p>Strong Mind • Strong Body</p>
 
     </div>
 
     <div class="copy">
-      © 2025 CrazyGym — All Rights Reserved
+      © 2025 Ahmed-Mostafa — All Rights Reserved
     </div>
   </div>
 </footer>
@@ -1322,6 +1343,40 @@
       chatBadge.style.background = '#777';
     }
   });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  import { onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const notifCount = document.getElementById("notifCount");
+
+onAuthStateChanged(auth, user => {
+  if(!user) return;
+
+  const userRef = doc(db,"users",user.uid);
+
+  onSnapshot(userRef, snap => {
+    const data = snap.data();
+    if(data.unreadMessages > 0){
+      notifCount.style.display = "block";
+      notifCount.textContent = data.unreadMessages;
+    } else {
+      notifCount.style.display = "none";
+    }
+  });
+});
+
 </script>
 </body>
 </html>

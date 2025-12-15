@@ -563,6 +563,33 @@ onAuthStateChanged(auth, async user=>{
 
   loadCoachClients(user.email);
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+import { increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+await addDoc(collection(db,"messages"),{
+  text: message,
+  from: coachUid,
+  to: clientUid,
+  createdAt: serverTimestamp()
+});
+
+// زود العداد عند العميل
+await updateDoc(doc(db,"users",clientUid),{
+  unreadMessages: increment(1)
+});
+
 </script>
 
 </body>
