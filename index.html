@@ -1070,10 +1070,7 @@
   
   <div class="icons">
 
-    <div id="notifyBtn" class="notify-icon">
-      🔔
-      <span id="notifyBadge" class="notify-badge" style="display:none;">0</span>
-    </div>
+  
     <!-- userBtn هنا -->
     <!-- menuBtn هنا -->
 
@@ -1128,7 +1125,8 @@
 
     <a class="link" href="profile.html">Profile <i class="fa-solid fa-user" style="margin-left:auto"></i></a>
     <a class="link" href="contact.html">Contact us <i class="fa-solid fa-envelope" style="margin-left:auto"></i></a>
-    <a class="link" href="workouts.html">Exercises<i class="fa-solid fa-dumbbell" style="margin-left:auto"></i></a>
+     <a class="link" href="workouts.html">Exercises<i class="fa-solid fa-dumbbell" style="margin-left:auto"></i></a>
+      <a class="link" href="index.html">Back<i class="fa-solid fa" style="margin-left:auto"></i></a>
   </nav>
 
 </div>
@@ -1466,21 +1464,7 @@
       return;
     }
 
-    // 🔔 مراقبة عدد الرسائل غير المقروءة
-const userDocRef = doc(db, 'users', user.uid);
-
-onSnapshot(userDocRef, (snap)=>{
-  if(!snap.exists()) return;
-
-  const unread = snap.data().unreadMessages || 0;
-
-  if(unread > 0){
-    notifyBadge.style.display = 'block';
-    notifyBadge.textContent = unread;
-  }else{
-    notifyBadge.style.display = 'none';
-  }
-});
+   
 
 
     // user logged: try show user photo or initials avatar
